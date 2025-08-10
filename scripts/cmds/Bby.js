@@ -141,4 +141,60 @@ module.exports = {
 "আমি হাজারো মশার Crush😓",
   "প্রেম করার বয়সে লেখাপড়া করতেছি, রেজাল্ট তো খা/রা'প হবেই.!🙂",
   "আমার ইয়ারফোন চু'রি হয়ে গিয়েছে!! কিন্তু চোর'কে গা-লি দিলে আমার বন্ধু রেগে যায়!'🙂",
-  "ছেলেদের প্রতি আমার এক আকাশ পরি
+  "ছেলেদের প্রতি আমার এক আকাশ পরিমান শরম🥹🫣",
+  "__ফ্রী ফে'সবুক চালাই কা'রন ছেলেদের মুখ দেখা হারাম 😌",
+  "মন সুন্দর বানাও মুখের জন্য তো 'Snapchat' আছেই! 🌚"
+
+ ];
+
+
+    const message = event.body?.toLowerCase() || "";
+    const words = message.split(" ");
+    const wordCount = words.length;
+
+    if (event.type !== "message_reply" && mahmuds.some(word => message.startsWith(word))) {
+      api.setMessageReaction("🪽", event.messageID, () => {}, true);
+      api.sendTypingIndicator(event.threadID, true);
+
+      if (wordCount === 1) {
+        const randomMsg = responses[Math.floor(Math.random() * responses.length)];
+        api.sendMessage(randomMsg, event.threadID, (err, info) => {
+          if (!err) {
+            global.GoatBot.onReply.set(info.messageID, {
+              commandName: "bot",
+              type: "reply",
+              messageID: info.messageID,
+              author: event.senderID,
+              link: randomMsg,
+            });
+          }
+        }, event.messageID);
+      } else {
+        const userText = words.slice(1).join(" ");
+        const botResponse = await getBotResponse(userText);
+        api.sendMessage(botResponse, event.threadID, (err, info) => {
+          if (!err) {
+            global.GoatBot.onReply.set(info.messageID, {
+              commandName: "bot",
+              type: "reply",
+              messageID: info.messageID,
+              author: event.senderID,
+              text: botResponse,
+            });
+          }
+        }, event.messageID);
+      }
+    }
+  },
+};
+
+async function getBotResponse(message) {
+  try {
+    const base = await baseApiUrl();
+    const response = await axios.get(${base}/jan/font3/${encodeURIComponent(message)});
+    return response.data?.message || "try Again";
+  } catch (error) {
+    console.error("API Error:", error.message || error);
+    return "error janu 🥲";
+  }
+}
